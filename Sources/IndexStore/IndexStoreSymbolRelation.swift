@@ -13,12 +13,12 @@
 public import IndexStoreCAPI
 
 /// A relation of a symbol occurrence to another symbol.
-public struct IndexStoreSymbolRelation: ~Escapable, Sendable {
+public struct IndexStoreSymbolRelation: Sendable {
   @usableFromInline nonisolated(unsafe) let relation: indexstore_symbol_relation_t
   @usableFromInline let library: IndexStoreLibrary
 
-  @usableFromInline @_lifetime(borrow relation, borrow library)
-  init(relation: indexstore_symbol_relation_t, library: borrowing IndexStoreLibrary) {
+  @usableFromInline
+  init(relation: indexstore_symbol_relation_t, library: IndexStoreLibrary) {
     self.relation = relation
     self.library = library
   }
@@ -36,10 +36,10 @@ public struct IndexStoreSymbolRelation: ~Escapable, Sendable {
   /// The symbol to which the base symbol is related using the above role.
   @inlinable
   public var symbol: IndexStoreSymbol {
-    @_lifetime(borrow self)
+
     get {
       let symbol = IndexStoreSymbol(symbol: library.api.symbol_relation_get_symbol(relation)!, library: library)
-      return _overrideLifetime(symbol, borrowing: self)
+      return symbol
     }
   }
 }

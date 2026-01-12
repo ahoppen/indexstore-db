@@ -20,35 +20,25 @@ public import IndexStoreCAPI
 ///    that backs `Swift.String`.
 ///  - In contrast to `Swift.String`, this type does not validate its contents for valid Unicode, saving additional
 ///    performance overhead.
-public struct IndexStoreStringRef: ~Escapable, Sendable {
+public struct IndexStoreStringRef: Sendable {
   /// It would be nice if this was a `Span<UInt8>` but indexstore-db talks in terms of `Span<CChar>` (aka. `Span<Int8>`)
   /// and converting between different spans of different element types is not possible.
   /// https://github.com/swiftlang/swift/issues/85763
-  public let span: RawSpan
-
-  @_lifetime(borrow span)
-  public init(_ span: RawSpan) {
-    self.span = span
-  }
+  public nonisolated(unsafe) let span: UnsafeRawBufferPointer
 
   @usableFromInline
-  init(_ stringRef: borrowing indexstore_string_ref_t) {
+  init(_ stringRef: indexstore_string_ref_t) {
     // We cannot use optional binding here due to https://github.com/swiftlang/swift/issues/85753
     if stringRef.data != nil {
-      self.span = RawSpan(_unsafeStart: stringRef.data!, count: stringRef.length)
+      self.span = UnsafeRawBufferPointer(start: stringRef.data!, count: stringRef.length)
     } else {
-      self.span = RawSpan()
+      self.span = UnsafeRawBufferPointer(start: nil, count: 0)
     }
   }
 
-  @available(macOS 26, *)
-  public init(_ bytes: borrowing [UInt8]) {
-    self.span = bytes.span.bytes
-  }
-
-  @available(macOS 26, *)
-  public init(_ string: borrowing String) {
-    self.span = string.utf8Span.span.bytes
+  @usableFromInline
+  init(_ stringRef: UnsafeRawBufferPointer) {
+    self.span = stringRef
   }
 
   /// Generate an `IndexStoreStringRef` to a Swift `String`.
@@ -58,11 +48,9 @@ public struct IndexStoreStringRef: ~Escapable, Sendable {
     var string = string
     return try string.withUTF8 { buffer in
       if let baseAddress = buffer.baseAddress {
-        let span = RawSpan(_unsafeStart: baseAddress, count: buffer.count)
-        return try body(IndexStoreStringRef(span))
+        return try body(IndexStoreStringRef(UnsafeRawBufferPointer(buffer)))
       }
-      let span = RawSpan()
-      return try body(IndexStoreStringRef(span))
+      return try body(IndexStoreStringRef(UnsafeRawBufferPointer(start: nil, count: 0)))
     }
   }
 
@@ -83,7 +71,7 @@ public struct IndexStoreStringRef: ~Escapable, Sendable {
 
   /// Execute the closure with an pointer to a null-terminated version of this string.
   func withCString<T>(_ body: (UnsafePointer<UInt8>) throws -> T) rethrows -> T {
-    return try withUnsafeTemporaryAllocation(of: UInt8.self, capacity: span.byteCount + 1) { cString in
+    return try withUnsafeTemporaryAllocation(of: UInt8.self, capacity: span.count + 1) { cString in
       let index = span.withUnsafeBytes { cString.initialize(fromContentsOf: $0) }
       cString.initializeElement(at: index, to: 0)
       return try body(UnsafePointer(cString.baseAddress!))

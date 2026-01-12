@@ -12,7 +12,7 @@
 
 public import IndexStoreCAPI
 
-public struct IndexStoreUnitDependency: ~Escapable, Sendable {
+public struct IndexStoreUnitDependency: Sendable {
   public struct Kind: RawRepresentable, Sendable, Hashable {
     public let rawValue: UInt8
 
@@ -34,8 +34,8 @@ public struct IndexStoreUnitDependency: ~Escapable, Sendable {
   @usableFromInline nonisolated(unsafe) let dependency: indexstore_unit_dependency_t
   @usableFromInline let library: IndexStoreLibrary
 
-  @usableFromInline @_lifetime(borrow dependency, borrow library)
-  init(dependency: indexstore_unit_dependency_t, library: borrowing IndexStoreLibrary) {
+  @usableFromInline
+  init(dependency: indexstore_unit_dependency_t, library: IndexStoreLibrary) {
     self.dependency = dependency
     self.library = library
   }
@@ -56,20 +56,20 @@ public struct IndexStoreUnitDependency: ~Escapable, Sendable {
   /// module in case of a unit dependency.
   @inlinable
   public var filePath: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_dependency_get_filepath(dependency))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// For Swift, the name of the module as part of which the dependency was compiled.
   @inlinable
   public var moduleName: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_dependency_get_modulename(dependency))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -77,10 +77,10 @@ public struct IndexStoreUnitDependency: ~Escapable, Sendable {
   /// dependency.
   @inlinable
   public var name: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_dependency_get_name(dependency))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 }

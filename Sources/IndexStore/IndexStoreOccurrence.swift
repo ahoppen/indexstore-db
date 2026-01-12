@@ -19,12 +19,12 @@ public import IndexStoreCAPI
 ///
 /// A symbol may also have related symbols. For example if this occurrence is inside a function declaration, than the
 /// occurrence will have the a `childOf` relation to that function's symbol.
-public struct IndexStoreOccurrence: ~Escapable, Sendable {
+public struct IndexStoreOccurrence: Sendable {
   @usableFromInline nonisolated(unsafe) let occurrence: indexstore_occurrence_t
   @usableFromInline let library: IndexStoreLibrary
 
-  @usableFromInline @_lifetime(borrow occurrence, borrow library)
-  init(occurrence: indexstore_occurrence_t, library: borrowing IndexStoreLibrary) {
+  @usableFromInline
+  init(occurrence: indexstore_occurrence_t, library: IndexStoreLibrary) {
     self.occurrence = occurrence
     self.library = library
   }
@@ -33,10 +33,10 @@ public struct IndexStoreOccurrence: ~Escapable, Sendable {
   /// The symbol that is referenced by this occurrence.
   @inlinable
   public var symbol: IndexStoreSymbol {
-    @_lifetime(borrow self)
+
     get {
       let symbol = IndexStoreSymbol(symbol: library.api.occurrence_get_symbol(occurrence)!, library: library)
-      return _overrideLifetime(symbol, borrowing: self)
+      return symbol
     }
   }
 
@@ -45,7 +45,7 @@ public struct IndexStoreOccurrence: ~Escapable, Sendable {
   /// of or the classes/protocols that are base types of a class definition.
   @inlinable
   public var relations: RelationsSequence {
-    @_lifetime(borrow self)
+
     get {
       return RelationsSequence(self)
     }
@@ -76,11 +76,11 @@ public struct IndexStoreOccurrence: ~Escapable, Sendable {
   /// Specialized version of `IndexStoreSequence` that can have a lifetime dependence on a `IndexStoreOccurrence`.
   ///
   /// There currently doesn't seem to be a way to model this using the closure-taking `IndexStoreSequence`.
-  public struct RelationsSequence: ~Escapable {
+  public struct RelationsSequence {
     @usableFromInline let producer: IndexStoreOccurrence
 
-    @usableFromInline @_lifetime(borrow producer)
-    init(_ producer: borrowing IndexStoreOccurrence) {
+    @usableFromInline
+    init(_ producer: IndexStoreOccurrence) {
       self.producer = producer
     }
 

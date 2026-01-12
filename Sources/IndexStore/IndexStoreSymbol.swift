@@ -16,7 +16,7 @@ public import IndexStoreCAPI
 ///
 /// A symbol by itself does not have any source information associated with it. It just represents the declaration
 /// itself, `IndexStoreSymbolOccurrence` represents actual occurrences of symbols within a source file.
-public struct IndexStoreSymbol: ~Escapable, Sendable {
+public struct IndexStoreSymbol: Sendable {
   public struct Kind: RawRepresentable, Hashable, Sendable {
     public let rawValue: UInt16
 
@@ -128,8 +128,8 @@ public struct IndexStoreSymbol: ~Escapable, Sendable {
   @usableFromInline nonisolated(unsafe) let symbol: indexstore_symbol_t
   @usableFromInline let library: IndexStoreLibrary
 
-  @usableFromInline @_lifetime(borrow symbol, borrow library)
-  init(symbol: indexstore_symbol_t, library: borrowing IndexStoreLibrary) {
+  @usableFromInline
+  init(symbol: indexstore_symbol_t, library: IndexStoreLibrary) {
     self.symbol = symbol
     self.library = library
   }
@@ -177,10 +177,10 @@ public struct IndexStoreSymbol: ~Escapable, Sendable {
   /// A human-readable name that identifies this symbol. This does not have to be unique.
   @inlinable
   public var name: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     get {
       let stringRef = IndexStoreStringRef(library.api.symbol_get_name(symbol))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -188,10 +188,10 @@ public struct IndexStoreSymbol: ~Escapable, Sendable {
   /// A USR that uniquely identifies this symbol.
   @inlinable
   public var usr: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     get {
       let stringRef = IndexStoreStringRef(library.api.symbol_get_usr(symbol))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -200,10 +200,10 @@ public struct IndexStoreSymbol: ~Escapable, Sendable {
   /// line option.
   @inlinable
   public var codegenName: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     get {
       let stringRef = IndexStoreStringRef(library.api.symbol_get_codegen_name(symbol))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 }

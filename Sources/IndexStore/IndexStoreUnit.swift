@@ -57,21 +57,20 @@ public final class IndexStoreUnit: Sendable {
   /// The name of the compiler that produced this unit.
   @inlinable
   public var providerIdentifier: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_provider_identifier(unitReader))
-      // _overrideLifetime is needed here and below because of https://github.com/swiftlang/swift/issues/85765.
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// The version of the compiler that produced this unit, if known.
   @inlinable
   public var providerVersion: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_provider_version(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -89,30 +88,30 @@ public final class IndexStoreUnit: Sendable {
   /// Empty if `hasMainFile` is `false`.
   @inlinable
   public var mainFile: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_main_file(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// For Swift files, the name of the module in which the source file was compiled.
   @inlinable
   public var moduleName: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_module_name(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// The working directory used during the module's compilation.
   @inlinable
   public var workingDirectory: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_working_dir(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -121,30 +120,30 @@ public final class IndexStoreUnit: Sendable {
   /// See discussion in `Index Store.md` about what this signifies.-
   @inlinable
   public var outputFile: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_output_file(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// Path to the SDK that was used to compile this unit.
   @inlinable
   public var sysrootPath: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_sysroot_path(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
   /// Triple of the target that was used to compile this unit.
   @inlinable
   public var target: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     borrowing get {
       let stringRef = IndexStoreStringRef(library.api.unit_reader_get_target(unitReader))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 

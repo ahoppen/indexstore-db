@@ -13,12 +13,12 @@
 public import IndexStoreCAPI
 
 /// A `#include` (or equivalent like `#import`) directive that was processed while indexing a unit.
-public struct IndexStoreUnitInclude: ~Escapable, Sendable {
+public struct IndexStoreUnitInclude: Sendable {
   @usableFromInline nonisolated(unsafe) let include: indexstore_unit_include_t
   @usableFromInline let library: IndexStoreLibrary
 
-  @usableFromInline @_lifetime(borrow include, borrow library)
-  init(include: indexstore_unit_include_t, library: borrowing IndexStoreLibrary) {
+  @usableFromInline
+  init(include: indexstore_unit_include_t, library: IndexStoreLibrary) {
     self.include = include
     self.library = library
   }
@@ -26,10 +26,10 @@ public struct IndexStoreUnitInclude: ~Escapable, Sendable {
   /// The path of the source file that contains the `#include` directive.
   @inlinable
   public var sourcePath: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     get {
       let stringRef = IndexStoreStringRef(library.api.unit_include_get_source_path(include))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 
@@ -42,10 +42,10 @@ public struct IndexStoreUnitInclude: ~Escapable, Sendable {
   /// The path of the source file that is included.
   @inlinable
   public var targetPath: IndexStoreStringRef {
-    @_lifetime(borrow self)
+
     get {
       let stringRef = IndexStoreStringRef(library.api.unit_include_get_target_path(include))
-      return _overrideLifetime(stringRef, borrowing: self)
+      return stringRef
     }
   }
 }

@@ -22,7 +22,7 @@ public enum IterationContinuationBehavior {
 /// The yielded values are non-Escapable because they are backed by stack allocated memory inside `libIndexStore`.
 /// When needed, use `map` or `compactMap` to extract all pieces of information that are relevant from this sequence
 /// into an escapable array.
-public struct IndexStoreSequence<Element: ~Escapable> {
+public struct IndexStoreSequence<Element> {
   @usableFromInline let iterate: ((Element) -> IterationContinuationBehavior) -> Void
 
   @usableFromInline
